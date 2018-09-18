@@ -1,9 +1,21 @@
 <?php
+/**
+ * Script to proxy requests to Facebook Graph API
+ *
+ * user_id and access_token should be requested here:
+ *
+ *      https://developers.facebook.com/tools/explorer
+ * 
+ * @author: Mikhail Stepanov <stepanov.michael@gmail.com>
+ *
+ */
 
 require_once __DIR__ . '/../vendor/autoload.php';
 include_once __DIR__ . '/../config/config.php';
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Handler\StreamHandler;
 
 if (!empty($_GET)) {
     $method = 'GET';
@@ -17,21 +29,24 @@ if (!empty($_GET)) {
         'form_params' => $_POST
     ];
     $uri = !empty($_POST['uri']) ? $_POST['uri'] : '';
-} else {
-    die("Empty request!");
 }
 
 $params['query']['access_token'] = $config['token'];
+$baseUrl = $config['host'] . '/' . $config['version'];
 
+$handler = new StreamHandler();
+$stack = HandlerStack::create($handler);
 $client = new Client([
-    'base_uri' => $config['host'] . '/' . $config['version'],
+    'base_uri' => $baseUrl,
     'timeout'  => $config['time_out'],
+    'handler' => $stack,
 ]);
 
 try {
-    $response = $client->request($method, '/' . $config['user_id'] . '/' . $uri, $params);
+    $response = $client->request($method,  $baseUrl . '/' . $config['user_id'] . '/' . $uri, $params);
+    
+    echo $response->getBody();
 } catch (Exception $e) {
-    die("[Exception] cannot send request: " . $e->getMessage());
+    echo "Sending request to Facebook Graph API failed: " . $e->getMessage();
+    exit;
 }
-
-echo $response->getBody();
