@@ -1,0 +1,19 @@
+{
+    "name": "wh-test-fb-graph-api-proxy",
+    "description": "WH Test FB Graph API proxy",
+    "authors": [
+        {
+            "name": "Michael Stepanov",
+            "email": "stepanov.michael@gmail.com",
+            "homepage": "http://stepanoff.org",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~6.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "*"
+    }
+
+}
